@@ -7,7 +7,7 @@ import { Activity, Clock, ArrowLeft, Trash2 } from "lucide-react"
 export default async function WorkoutDetailPage({
   params,
 }: {
-  params: { id: string }
+  params: Promise<{ id: string }>
 }) {
   const supabase = await createServerSupabaseClient()
 
@@ -16,21 +16,22 @@ export default async function WorkoutDetailPage({
   if (!user) redirect("/login")
 
   // Get the workout
-  const { data: workout, error } = await supabase
-    .from("workouts")
-    .select("*")
-    .eq("id", params.id)
-    .eq("user_id", user.id)
-    .single()
+  const { id } = await params
 
+const { data: workout, error } = await supabase
+  .from("workouts")
+  .select("*")
+  .eq("id", id)
+  .eq("user_id", user.id)
+  .single()
   // If workout not found redirect to workout page
   if (error || !workout) redirect("/workout")
 
   // Get all exercises for this workout
-  const { data: exercises } = await supabase
-    .from("exercises")
-    .select("*")
-    .eq("workout_id", params.id)
+const { data: exercises } = await supabase
+  .from("exercises")
+  .select("*")
+  .eq("workout_id", id)
 
   return (
     <div className="min-h-screen bg-[#0a0a0a]">
