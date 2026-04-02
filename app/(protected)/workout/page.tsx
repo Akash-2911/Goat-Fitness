@@ -48,7 +48,7 @@ export default function WorkoutPage() {
   async function handleSearch() {
     if (!searchQuery.trim()) return
     setSearching(true)
-    console.log("API Key:", process.env.NEXT_PUBLIC_RAPIDAPI_KEY)  // add this line
+    
 
     try {
       const response = await fetch(
