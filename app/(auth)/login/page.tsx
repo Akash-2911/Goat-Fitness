@@ -12,6 +12,17 @@ export default function LoginPage() {
   const [error, setError] = useState("")
   const [loading, setLoading] = useState(false)
 
+  const [resendMsg, setResendMsg] = useState("")
+
+async function handleResend() {
+  const supabase = createClient()
+  const { error } = await supabase.auth.resend({
+    type: "signup",
+    email,
+  })
+  if (!error) setResendMsg("Confirmation email sent! Check your inbox.")
+}
+
   async function handleLogin() {
     setLoading(true)
     setError("")
@@ -49,11 +60,26 @@ export default function LoginPage() {
           <h1 className="text-xl font-bold mb-6">Log in to your account</h1>
 
           {/* Error message */}
-          {error && (
-            <div className="bg-red-500/10 border border-red-500/20 rounded-lg px-4 py-3 mb-4">
-              <p className="text-red-400 text-sm">{error}</p>
-            </div>
-          )}
+{error && (
+  <div className="bg-red-500/10 border border-red-500/20 rounded-lg px-4 py-3 mb-4">
+    <p className="text-red-400 text-sm">{error}</p>
+    {error.toLowerCase().includes("confirm") && (
+      <button
+        onClick={handleResend}
+        className="text-[#C8FF00] text-sm hover:underline mt-2 block"
+      >
+        Resend confirmation email
+      </button>
+    )}
+  </div>
+)}
+
+{/* Success message after resend */}
+{resendMsg && (
+  <div className="bg-green-500/10 border border-green-500/20 rounded-lg px-4 py-3 mb-4">
+    <p className="text-green-400 text-sm">{resendMsg}</p>
+  </div>
+)}
 
           {/* Email */}
           <div className="mb-4">

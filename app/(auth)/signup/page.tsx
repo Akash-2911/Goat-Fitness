@@ -27,13 +27,13 @@ export default function SignupPage() {
       }
     })
 
-    if (error) {
-      setError(error.message)
-      setLoading(false)
-      return
-    }
+  if (error) {
+  setError(error.message)
+  setLoading(false)
+  return
+}
 
-    router.push("/dashboard")
+router.push("/login")
   }
 
   return (
