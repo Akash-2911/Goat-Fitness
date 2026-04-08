@@ -1,11 +1,11 @@
-import { createServerSupabaseClient } from "@/lib/supabase-server"
+import { createClient } from "@/lib/supabase-server"
 import { redirect } from "next/navigation"
 import Link from "next/link"
 import Navbar from "@/components/navbar"
 import { Activity, Droplets, Target, Zap } from "lucide-react"
 
 export default async function DashboardPage() {
-  const supabase = await createServerSupabaseClient()
+  const supabase = await createClient()
 
   // Check if user is logged in
   const { data: { user } } = await supabase.auth.getUser()
