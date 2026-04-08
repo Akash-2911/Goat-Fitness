@@ -153,6 +153,28 @@ export default function WorkoutPage() {
       setSaving(false)
       return
     }
+    // save workout progress locally for Progress page
+
+const today = new Date().toISOString().split("T")[0]
+
+const existing = localStorage.getItem("fitnessProgress")
+
+let progress = existing ? JSON.parse(existing) : []
+
+const index = progress.findIndex((p: any) => p.date === today)
+
+if (index !== -1) {
+  progress[index].workouts += 1
+} else {
+  progress.push({
+    date: today,
+    calories: 0,
+    workouts: 1,
+    water: 0,
+  })
+}
+
+localStorage.setItem("fitnessProgress", JSON.stringify(progress))
 
     setSaved(true)
     setTimeout(() => router.push("/dashboard"), 1500)

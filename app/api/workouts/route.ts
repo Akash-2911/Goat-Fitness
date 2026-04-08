@@ -1,9 +1,9 @@
-import { createServerSupabaseClient } from "@/lib/supabase-server"
+import { createClient } from "@/lib/supabase-server"
 import { NextResponse } from "next/server"
 
 // GET — fetch all workouts for the logged in user
 export async function GET() {
-  const supabase = await createServerSupabaseClient()
+  const supabase = await createClient()
 
   // Check user is logged in
   const { data: { user } } = await supabase.auth.getUser()
@@ -27,7 +27,7 @@ export async function GET() {
 
 // POST — create a new workout
 export async function POST(request: Request) {
-  const supabase = await createServerSupabaseClient()
+  const supabase = await createClient()
 
   // Check user is logged in
   const { data: { user } } = await supabase.auth.getUser()
