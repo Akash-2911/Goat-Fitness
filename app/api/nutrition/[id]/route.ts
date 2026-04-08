@@ -3,12 +3,13 @@ import { createClient } from "@/lib/supabase-server";
 
 export async function DELETE(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params
+
     const supabase = await createClient();
 
-    // get logged-in user
     const {
       data: { user },
       error: userError,
@@ -20,8 +21,6 @@ export async function DELETE(
         { status: 401 }
       );
     }
-
-    const { id } = params;
 
     if (!id) {
       return NextResponse.json(
@@ -37,7 +36,6 @@ export async function DELETE(
       .eq("user_id", user.id);
 
     if (error) {
-      console.error("DELETE /api/nutrition error:", error);
       return NextResponse.json(
         { error: error.message },
         { status: 500 }
@@ -45,6 +43,7 @@ export async function DELETE(
     }
 
     return NextResponse.json({ success: true });
+
   } catch (error) {
     console.error("DELETE /api/nutrition unexpected error:", error);
     return NextResponse.json(

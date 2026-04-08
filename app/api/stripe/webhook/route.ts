@@ -1,64 +1,44 @@
-// app/api/stripe/webhook/route.ts
-
-import { NextRequest, NextResponse } from "next/server";
-import { stripe } from "@/lib/stripe";
-import { createBrowserClient } from "@supabase/ssr"; // ← use this directly
+import { NextRequest, NextResponse } from "next/server"
+import { getStripe } from "@/lib/stripe"
+import { createClient } from "@/lib/supabase-server"
 
 export async function POST(req: NextRequest) {
-
-  const body = await req.text();
-
-  const signature = req.headers.get("stripe-signature");
+  const body = await req.text()
+  const signature = req.headers.get("stripe-signature")
 
   if (!signature) {
-    console.error("No Stripe signature found");
-    return NextResponse.json(
-      { error: "No signature" },
-      { status: 400 }
-    );
+    return NextResponse.json({ error: "No signature" }, { status: 400 })
   }
 
-  let event;
+  let event
   try {
+    const stripe = getStripe()
     event = stripe.webhooks.constructEvent(
       body,
       signature,
       process.env.STRIPE_WEBHOOK_SECRET!
-    );
+    )
   } catch (error) {
-    console.error("Webhook verification failed:", error);
-    return NextResponse.json(
-      { error: "Invalid signature" },
-      { status: 400 }
-    );
+    console.error("Webhook verification failed:", error)
+    return NextResponse.json({ error: "Invalid signature" }, { status: 400 })
   }
 
   if (event.type === "checkout.session.completed") {
-    const session = event.data.object as any;
-    const customerEmail = session.customer_email;
+    const session = event.data.object as { customer_email: string }
+    const customerEmail = session.customer_email
 
-    console.log("✅ Payment successful for:", customerEmail);
-
-    const supabase = createBrowserClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-    );
+    const supabase = await createClient()
 
     const { error: dbError } = await supabase
-      .from("users")
+      .from("profiles")
       .update({ is_pro: true })
-      .eq("email", customerEmail);
+      .eq("email", customerEmail)
 
     if (dbError) {
-      console.error("Failed to update user:", dbError);
-      return NextResponse.json(
-        { error: "Database update failed" },
-        { status: 500 }
-      );
+      console.error("Failed to update user:", dbError)
+      return NextResponse.json({ error: "Database update failed" }, { status: 500 })
     }
-
-    console.log("⭐ User upgraded to Pro:", customerEmail);
   }
 
-  return NextResponse.json({ received: true });
+  return NextResponse.json({ received: true })
 }
