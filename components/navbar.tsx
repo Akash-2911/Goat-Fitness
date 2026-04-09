@@ -3,7 +3,7 @@
 import Link from "next/link"
 import { useRouter, usePathname } from "next/navigation"
 import { createClient } from "@/lib/supabase"
-import { Activity, Droplets, Target, TrendingUp, Users, LayoutDashboard, LogOut, Flag } from "lucide-react"
+import { Activity, Droplets, Target, TrendingUp, Users, LayoutDashboard, LogOut, User, Flag } from "lucide-react"
 
 export default function Navbar() {
   const router = useRouter()
@@ -17,6 +17,7 @@ export default function Navbar() {
 
   const links = [
     { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
+    { href: "/profile", label: "Profile", icon: User },
     { href: "/workout", label: "Workout", icon: Activity },
     { href: "/nutrition", label: "Nutrition", icon: Target },
     { href: "/water", label: "Water", icon: Droplets },
