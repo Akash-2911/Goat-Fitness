@@ -1,66 +1,84 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server"
 
 export async function GET(request: NextRequest) {
   try {
-    const query = request.nextUrl.searchParams.get("query");
+    const query = request.nextUrl.searchParams.get("query")
 
     if (!query || !query.trim()) {
       return NextResponse.json(
         { error: "Search query is required" },
         { status: 400 }
-      );
+      )
     }
 
+    // Use the more reliable Open Food Facts search endpoint
     const searchUrl =
       `https://world.openfoodfacts.org/cgi/search.pl` +
-      `?search_terms=${encodeURIComponent(query)}` +
+      `?search_terms=${encodeURIComponent(query.trim())}` +
       `&search_simple=1` +
       `&action=process` +
       `&json=1` +
-      `&page_size=20` +
-      `&fields=code,product_name,brands,nutriments`;
+      `&page_size=10` +
+      `&fields=code,product_name,brands,nutriments,serving_size`
 
     const response = await fetch(searchUrl, {
       method: "GET",
       headers: {
-        Accept: "application/json",
-        "User-Agent": "GOAT-Fitness-SAIT/1.0",
+        "Accept": "application/json",
+        "User-Agent": "GOATFitness/1.0 (contact@goatfitness.app)",
       },
-      cache: "no-store",
-    });
-
-    const contentType = response.headers.get("content-type") || "";
-    const rawText = await response.text();
+      next: { revalidate: 60 },
+    })
 
     if (!response.ok) {
-      console.error("Open Food Facts response error:", rawText);
-
-      return NextResponse.json(
-        { error: "Failed to fetch food data from Open Food Facts" },
-        { status: response.status }
-      );
+      // If Open Food Facts is down try backup search
+      return await backupSearch(query)
     }
 
+    const contentType = response.headers.get("content-type") || ""
     if (!contentType.includes("application/json")) {
-      console.error("Expected JSON but got:", rawText);
-
-      return NextResponse.json(
-        { error: "Open Food Facts returned non-JSON response" },
-        { status: 500 }
-      );
+      return await backupSearch(query)
     }
 
-    const data = JSON.parse(rawText);
+    const data = await response.json()
+    const products = (data.products || []).filter(
+      (p: any) => p.product_name && p.product_name.trim() !== ""
+    )
 
-    return NextResponse.json({
-      products: data.products || [],
-    });
+    return NextResponse.json({ products })
+
   } catch (error) {
-    console.error("Food search API error:", error);
-
+    console.error("Food search error:", error)
     return NextResponse.json(
-      { error: "Internal server error while searching food" },
+      { error: "Failed to search foods. Please try again." },
       { status: 500 }
-    );
+    )
+  }
+}
+
+// Backup search using Open Food Facts v2 API
+async function backupSearch(query: string) {
+  try {
+    const url = `https://world.openfoodfacts.org/api/v2/search?` +
+      `categories_tags_en=${encodeURIComponent(query)}` +
+      `&fields=code,product_name,brands,nutriments` +
+      `&page_size=10`
+
+    const response = await fetch(url, {
+      headers: {
+        "User-Agent": "GOATFitness/1.0",
+        "Accept": "application/json",
+      },
+    })
+
+    if (!response.ok) {
+      return NextResponse.json({ products: [] })
+    }
+
+    const data = await response.json()
+    return NextResponse.json({ products: data.products || [] })
+
+  } catch {
+    return NextResponse.json({ products: [] })
   }
 }
