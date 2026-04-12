@@ -38,16 +38,18 @@ export default function NutritionPage() {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          food_name: food.product_name,
-          calories: food.nutriments?.["energy-kcal_100g"],
-          protein_g: food.nutriments?.proteins_100g,
-          carbs_g: food.nutriments?.carbohydrates_100g,
-          fat_g: food.nutriments?.fat_100g,
-        }),
+       body: JSON.stringify({
+       food_name: food.product_name?.trim() || "Unknown food",
+        calories: Math.round(Number(food.nutriments?.["energy-kcal_100g"] ?? 0)),
+        protein_g: Math.round(Number(food.nutriments?.proteins_100g ?? 0)),
+        carbs_g: Math.round(Number(food.nutriments?.carbohydrates_100g ?? 0)),
+        fat_g: Math.round(Number(food.nutriments?.fat_100g ?? 0)),  
+    }),
       });
 
       if (!res.ok) {
+        const errorText = await res.text();
+        console.error("Failed to add food:", errorText);
         throw new Error("Failed to add food");
       }
 
@@ -79,22 +81,22 @@ export default function NutritionPage() {
   };
 
   const totalCalories = dailyLog.reduce(
-    (total, food) => total + (food.calories ?? 0),
+    (total, food) => total + (Number(food.calories) || 0),
     0
   );
 
   const totalProtein = dailyLog.reduce(
-    (total, food) => total + (food.protein_g ?? 0),
+    (total, food) => total + (Number(food.protein_g) || 0),
     0
   );
 
   const totalCarbs = dailyLog.reduce(
-    (total, food) => total + (food.carbs_g ?? 0),
+    (total, food) => total + (Number(food.carbs_g) || 0),
     0
   );
 
   const totalFat = dailyLog.reduce(
-    (total, food) => total + (food.fat_g ?? 0),
+    (total, food) => total + (Number(food.fat_g) || 0),
     0
   );
 
@@ -114,6 +116,12 @@ export default function NutritionPage() {
         </div>
 
         <NutritionSearch onSelectFood={handleSelectFood} />
+
+        {loading && (
+          <div className="bg-[#111318] border border-white/8 rounded-2xl p-4 mt-6">
+            <p className="text-white/40 text-sm">Adding food...</p>
+          </div>
+        )}
 
         {/* summary */}
         <div className="bg-[#111318] border border-white/8 rounded-2xl p-6 mt-6">
@@ -140,7 +148,7 @@ export default function NutritionPage() {
                 <div>
                   <p className="text-white">{food.food_name}</p>
                   <p className="text-xs text-white/40">
-                    {food.calories} kcal
+                    {Number(food.calories) || 0} kcal
                   </p>
                 </div>
 

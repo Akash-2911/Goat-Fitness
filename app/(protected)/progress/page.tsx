@@ -140,24 +140,45 @@ export default function ProgressPage() {
           <h2 className="font-bold mb-4">Overview</h2>
 
           <div className="grid gap-4 sm:grid-cols-2">
+            {/* Total calories */}
             <div className="bg-white/3 border border-white/5 rounded-xl p-4">
               <p className="text-sm text-white/40">Total calories</p>
               <p className="mt-1 text-xl font-bold">{totalCalories}</p>
+
+              <p className="mt-1 text-xs text-white/50">
+                Calculated by summing all calories recorded from nutrition logs across tracked days.
+              </p>
             </div>
 
+            {/* Total water */}
             <div className="bg-white/3 border border-white/5 rounded-xl p-4">
               <p className="text-sm text-white/40">Total water</p>
               <p className="mt-1 text-xl font-bold">{totalWater}</p>
+
+              <p className="mt-1 text-xs text-white/50">
+                This number is calculated from the total glasses of water you recorded in your daily hydration log.
+
+              </p>
             </div>
 
+            {/* Total workouts */}
             <div className="bg-white/3 border border-white/5 rounded-xl p-4">
               <p className="text-sm text-white/40">Total workouts</p>
               <p className="mt-1 text-xl font-bold">{totalWorkouts}</p>
+
+              <p className="mt-1 text-xs text-white/50">
+                Counts all workouts completed and stored during the selected tracking period.
+              </p>
             </div>
 
+            {/* Active days */}
             <div className="bg-white/3 border border-white/5 rounded-xl p-4">
               <p className="text-sm text-white/40">Active days</p>
               <p className="mt-1 text-xl font-bold">{activeDays}</p>
+
+              <p className="mt-1 text-xs text-white/50">
+                Represents the number of days where nutrition or hydration activity was recorded.
+              </p>
             </div>
           </div>
         </div>
