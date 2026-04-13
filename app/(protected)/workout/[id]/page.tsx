@@ -2,7 +2,9 @@ import { createClient as createServerSupabaseClient } from "@/lib/supabase-serve
 import { redirect } from "next/navigation"
 import Link from "next/link"
 import Navbar from "@/components/navbar"
-import { Activity, Clock, ArrowLeft, Trash2 } from "lucide-react"
+import { Activity, Clock, ArrowLeft } from "lucide-react"
+import { DeleteWorkoutButton } from "@/components/delete-workout-button"
+import { ShareWorkoutButton } from "@/components/share-workout-button"
 
 export default async function WorkoutDetailPage({
   params,
@@ -11,27 +13,30 @@ export default async function WorkoutDetailPage({
 }) {
   const supabase = await createServerSupabaseClient()
 
-  // Check user is logged in
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect("/login")
 
-  // Get the workout
   const { id } = await params
 
-const { data: workout, error } = await supabase
-  .from("workouts")
-  .select("*")
-  .eq("id", id)
-  .eq("user_id", user.id)
-  .single()
-  // If workout not found redirect to workout page
+  const { data: workout, error } = await supabase
+    .from("workouts")
+    .select("*")
+    .eq("id", id)
+    .eq("user_id", user.id)
+    .single()
+
   if (error || !workout) redirect("/workout")
 
-  // Get all exercises for this workout
-const { data: exercises } = await supabase
-  .from("exercises")
-  .select("*")
-  .eq("workout_id", id)
+  const { data: exercises } = await supabase
+    .from("exercises")
+    .select("*")
+    .eq("workout_id", id)
+
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("full_name")
+    .eq("id", user.id)
+    .single()
 
   return (
     <div className="min-h-screen bg-[#0a0a0a]">
@@ -76,14 +81,12 @@ const { data: exercises } = await supabase
                 </p>
               )}
             </div>
-
-            {/* Delete button */}
             <DeleteWorkoutButton workoutId={workout.id} />
           </div>
         </div>
 
         {/* Exercises list */}
-        <div>
+        <div className="mb-6">
           <h2 className="text-lg font-bold mb-4">
             Exercises{" "}
             <span className="text-white/30 font-normal text-base">
@@ -109,25 +112,17 @@ const { data: exercises } = await supabase
                     </div>
                     <h3 className="font-semibold capitalize">{exercise.name}</h3>
                   </div>
-
-                  {/* Sets, reps, weight */}
                   <div className="grid grid-cols-3 gap-3">
                     <div className="bg-white/3 rounded-xl p-3 text-center">
-                      <div className="text-xl font-black text-[#C8FF00]">
-                        {exercise.sets}
-                      </div>
+                      <div className="text-xl font-black text-[#C8FF00]">{exercise.sets}</div>
                       <div className="text-xs text-white/30 mt-0.5">Sets</div>
                     </div>
                     <div className="bg-white/3 rounded-xl p-3 text-center">
-                      <div className="text-xl font-black text-[#C8FF00]">
-                        {exercise.reps}
-                      </div>
+                      <div className="text-xl font-black text-[#C8FF00]">{exercise.reps}</div>
                       <div className="text-xs text-white/30 mt-0.5">Reps</div>
                     </div>
                     <div className="bg-white/3 rounded-xl p-3 text-center">
-                      <div className="text-xl font-black text-[#C8FF00]">
-                        {exercise.weight_kg || 0}
-                      </div>
+                      <div className="text-xl font-black text-[#C8FF00]">{exercise.weight_kg || 0}</div>
                       <div className="text-xs text-white/30 mt-0.5">kg</div>
                     </div>
                   </div>
@@ -137,10 +132,14 @@ const { data: exercises } = await supabase
           )}
         </div>
 
+        {/* Share section */}
+        <ShareWorkoutButton
+          workout={workout}
+          exercises={exercises || []}
+          userName={profile?.full_name || "A GOAT Fitness athlete"}
+        />
+
       </main>
     </div>
   )
 }
-
-// Delete button is a client component because it needs onClick
-import { DeleteWorkoutButton } from "@/components/delete-workout-button"
