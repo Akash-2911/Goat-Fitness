@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { Share2, Twitter, Facebook, Copy, CheckCircle, MessageCircle } from "lucide-react"
+import { Share2, Copy, CheckCircle, MessageCircle } from "lucide-react"
 
 type Exercise = {
   id: string
@@ -132,8 +132,8 @@ export function ShareWorkoutButton({ workout, exercises, userName }: Props) {
           onClick={() => openShare(shareUrls.twitter)}
           className="flex flex-col items-center gap-2 bg-sky-500/10 border border-sky-500/20 rounded-xl p-3 hover:bg-sky-500/20 transition-colors"
         >
-          <Twitter className="w-5 h-5 text-sky-400" />
-          <span className="text-xs text-sky-400 font-medium">Twitter / X</span>
+          <span className="text-sky-400 font-black text-sm">𝕏</span>
+<span className="text-xs text-sky-400 font-medium">Twitter / X</span>
         </button>
 
         {/* Facebook */}
@@ -141,8 +141,8 @@ export function ShareWorkoutButton({ workout, exercises, userName }: Props) {
           onClick={() => openShare(shareUrls.facebook)}
           className="flex flex-col items-center gap-2 bg-blue-500/10 border border-blue-500/20 rounded-xl p-3 hover:bg-blue-500/20 transition-colors"
         >
-          <Facebook className="w-5 h-5 text-blue-400" />
-          <span className="text-xs text-blue-400 font-medium">Facebook</span>
+          <span className="text-blue-400 font-black text-sm">f</span>
+<span className="text-xs text-blue-400 font-medium">Facebook</span>
         </button>
 
         {/* Copy link */}

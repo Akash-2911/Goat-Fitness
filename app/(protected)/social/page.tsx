@@ -4,7 +4,7 @@ import { useEffect, useState } from "react"
 import Navbar from "@/components/navbar"
 import { createClient } from "@/lib/supabase"
 import {
-  Share2, Twitter, Facebook, Copy,
+  Share2, Copy,
   CheckCircle, MessageCircle, Activity,
   Droplets, Target, Zap, Trophy
 } from "lucide-react"
@@ -157,14 +157,14 @@ export default function SocialPage() {
           onClick={() => openShare("twitter", text)}
           className="flex items-center gap-1.5 bg-sky-500/10 border border-sky-500/20 rounded-lg px-3 py-2 hover:bg-sky-500/20 transition-colors"
         >
-          <Twitter className="w-3.5 h-3.5 text-sky-400" />
+          <span className="text-sky-400 font-black text-xs">𝕏</span>
           <span className="text-xs text-sky-400 font-medium">Twitter</span>
         </button>
         <button
           onClick={() => openShare("facebook", text)}
           className="flex items-center gap-1.5 bg-blue-500/10 border border-blue-500/20 rounded-lg px-3 py-2 hover:bg-blue-500/20 transition-colors"
         >
-          <Facebook className="w-3.5 h-3.5 text-blue-400" />
+          <span className="text-blue-400 font-black text-xs leading-none">f</span>
           <span className="text-xs text-blue-400 font-medium">Facebook</span>
         </button>
         <button
